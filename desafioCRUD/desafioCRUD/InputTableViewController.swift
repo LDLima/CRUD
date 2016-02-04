@@ -18,14 +18,16 @@ class InputTableViewController: UITableViewController {
     
     
     @IBAction func saveBook(sender: AnyObject){
-        let book = Book(name: self.nameBook.text!, author: self.nameAuthor.text!, edition: Int(self.numberEdition.text!)!, publisher: self.namePublisher.text!, numberPages: Int(self.numberPages.text!)!)
-        if (BookDataSource.sharedInstance.flag != 0){
-            book.idBook = BookDataSource.sharedInstance.flag
-            updateBook(book)
-        }else{
-            saveNewBook(book)
+        if(!validaFields()){
+            let book = Book(name: self.nameBook.text!, author: self.nameAuthor.text!, edition: Int(self.numberEdition.text!)!, publisher: self.namePublisher.text!, numberPages: Int(self.numberPages.text!)!)
+            if (BookDataSource.sharedInstance.flag != 0){
+                book.idBook = BookDataSource.sharedInstance.flag
+                updateBook(book)
+            }else{
+                saveNewBook(book)
+            }
+            navigationController?.popToRootViewControllerAnimated(true)
         }
-        navigationController?.popToRootViewControllerAnimated(true)
 
     }
     
@@ -45,6 +47,18 @@ class InputTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    
+    //MARK: - Validates
+    func validaFields()->Bool{
+        if(self.nameBook.text!.isEmpty || self.nameAuthor.text!.isEmpty || self.numberEdition.text!.isEmpty || self.namePublisher.text!.isEmpty || self.numberPages.text!.isEmpty){
+            showErrorAlert()
+            return true
+        }
+        return false
+    }
+    
+    
+    //MARK: - Save functions
     func updateBook(book:Book){
         if (ModelManager.getInstance().updateBook(book)){
             print("Alterei!")
@@ -62,6 +76,15 @@ class InputTableViewController: UITableViewController {
         
     }
 
+    //MARK: - Alerts
+    func showErrorAlert(){
+        let alert = UIAlertController(title: "Error!", message: "Todos os campos precisam ser preenchidos!", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        alert.addAction((UIAlertAction(title: "Error!", style: UIAlertActionStyle.Default, handler: nil)))
+        
+        presentViewController(alert, animated: true, completion: nil)
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
